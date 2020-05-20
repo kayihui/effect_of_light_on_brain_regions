@@ -1,0 +1,79 @@
+---
+title: "Differential gene expression visualization - NAc WTvsPer1_light"
+output: html_document
+---
+
+Comparing the WT and Per1 with light treatment
+
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+library(DESeq2)
+library(ggplot2)
+
+# load the DESeqResult object
+setwd("~/Desktop/brainRNASeq/R_analysis/R_output/DESeq2Objects")
+dds.results <- readRDS("NAc/NAc_WTvsPer1_light.RData")
+```
+
+```{r}
+plotMA(dds.results, ylim = c(-2, 2))
+```
+
+```{r}
+metadata(dds.results)$filterThreshold
+```
+
+```{r}
+plot(metadata(dds.results)$filterNumRej, xlab="quantile of baseMean", 
+		 ylab="number of rejections")
+```
+
+```{r}
+hist(dds.results$pvalue, breaks = 20, col ='grey', 
+		 main = "The effect of light on WT", xlab = "pvalue", ylab = "Frequency")
+```
+
+```{r warning=FALSE}
+# load the dataframe with the gene info and remark added
+setwd("~/Desktop/brainRNASeq/R_analysis/R_output/results_tables/NAc")
+dds.results.table <- read.csv("NAc_WTvsPer1_light.csv", header = TRUE,
+															 stringsAsFactors = FALSE)
+
+dds.results.table$remark <- as.factor(dds.results.table$remark)
+
+summary(dds.results.table$remark)
+```
+
+```{r}
+# Volcano plot
+ggplot(dds.results.table, aes(x=log2FoldChange, y= -log10(pvalue))) + 
+	                         geom_jitter(aes(color = remark)) + 
+	                         ggtitle("WT vs Per1 mutant (light) Volcano plot")
+```
+
+```{r}
+library(ClassDiscovery) 
+library(RColorBrewer)
+
+setwd("~/Desktop/brainRNASeq/R_analysis/R_output/results_tables/NAc")
+rlog.transformated <- read.csv("NAc_rlog_transformated_data.csv")
+
+# subset the list of ensembl_gene_id of genes that are not "not significant"
+significant.genes <- dds.results.table[dds.results.table$log2FoldChange > 1,] 
+significant.genes.name <- significant.genes$ensembl_gene_id
+
+# subset the rlog transformed data with the significant genes list
+rlog.significant.genes <- rlog.transformated[ rlog.transformated$X %in% significant.genes.name,]
+rownames(rlog.significant.genes) <- rlog.significant.genes$X
+rlog.significant.genes <- rlog.significant.genes[,-1]
+rlog.significant.genes <- as.matrix(rlog.significant.genes)
+
+aspectHeatmap(rlog.significant.genes, labCol=NULL, Colv = NA,
+							                 hExp=2, 
+							                 wExp=1.4, 
+							                 margins=c(6,3))
+
+```
+
+```{r}
+sessionInfo()
+```

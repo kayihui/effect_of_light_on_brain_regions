@@ -1,0 +1,67 @@
+---
+title: "VTA all comparsion TopGO(Biological process, fisher test) heatmaps"
+output: html_document
+---
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+library(topGO)
+library(dplyr)
+library(tidyr)
+library(RColorBrewer)
+library(ClassDiscovery)
+```
+
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+# read in all the files
+setwd("~/Desktop/brainRNASeq/R_analysis/R_output/topGO/VTA")
+BP.GO.data <- readRDS("BP/VTA_all_comparsion_topGO_BP.RData")
+fisher.result <- read.csv("BP/VTA_all_comparsion_BP_fisher.csv", header = TRUE, stringsAsFactors = FALSE)
+```
+
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+#read in the rlog transformation table
+setwd("~/Desktop/brainRNASeq/R_analysis/R_output/results_tables/")
+rlog.transformed.data <- read.csv("VTA/VTA_rlog_transformated_data.csv", header = TRUE, stringsAsFactors = FALSE)
+```
+
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+# print the result table
+fisher.result
+```
+
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+# extract the list of genes by the topGO
+
+gene.from.GOterms <- genesInTerm(BP.GO.data, fisher.result$GO.ID)
+
+colnames(rlog.transformed.data)[1] <- "ensembl_gene_id"
+for (i in 1:10){
+	# looping for each GO
+  # accessing the list of gene in each GO term
+  gene.in.GO <- as.data.frame(gene.from.GOterms[i])
+  gene.in.GO <- as.vector(gene.in.GO[,1])
+
+  # subset the genes 
+  gene.interested.rlog <- rlog.transformed.data[rlog.transformed.data$ensembl_gene_id %in% gene.in.GO, ]
+
+  if (length(gene.interested.rlog$ensembl_gene_id) >= 2 ) {
+    # convert the dataframe to matrix with only the genes in the GO term
+    rownames(gene.interested.rlog) <- gene.interested.rlog$ensembl_gene_id
+    gene.interested.rlog <- select(gene.interested.rlog, - ensembl_gene_id)
+    gene.interested.rlog <- as.matrix(gene.interested.rlog)
+
+    # ploting the heatmap
+    aspectHeatmap(gene.interested.rlog, scale="row", Colv= NA, hExp=1, wExp=1.5, 
+    							margins=c(6,10),
+    							main = paste(fisher.result$GO.ID[i]),
+    							col = colorRampPalette(rev(brewer.pal(9,"RdBu")))(255))
+    }
+}
+
+#aspectHeatmap(gene.interested.rlog, scale="row", Colv= NA, hExp=1, wExp=1.5, 
+#							    margins=c(6,25),
+#    							main = paste(fisher.result$GO.ID[i]))
+```
+
+```{r}
+sessionInfo()
+```
