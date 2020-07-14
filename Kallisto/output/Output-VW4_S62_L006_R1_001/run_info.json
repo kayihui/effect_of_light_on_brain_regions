@@ -1,0 +1,13 @@
+{
+	"n_targets": 116067,
+	"n_bootstraps": 0,
+	"n_processed": 9053111,
+	"n_pseudoaligned": 5113398,
+	"n_unique": 1845751,
+	"p_pseudoaligned": 56.5,
+	"p_unique": 20.4,
+	"kallisto_version": "0.44.0",
+	"index_version": 10,
+	"start_time": "Wed Feb 27 17:33:41 2019",
+	"call": "kallisto quant -i mouse-index-k21 -o Output-VW4_S62_L006_R1_001 --single -l 48 -s 10 VW4_S62_L006_R1_001.fastq.gz"
+}

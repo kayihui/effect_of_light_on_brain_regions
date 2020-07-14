@@ -1,0 +1,13 @@
+{
+	"n_targets": 116067,
+	"n_bootstraps": 0,
+	"n_processed": 15964374,
+	"n_pseudoaligned": 9149598,
+	"n_unique": 3299585,
+	"p_pseudoaligned": 57.3,
+	"p_unique": 20.7,
+	"kallisto_version": "0.44.0",
+	"index_version": 10,
+	"start_time": "Mon Feb 25 20:49:20 2019",
+	"call": "kallisto quant -i mouse-index-k21 -o Output-NP17_S33_L003_R1_001 --single -l 48 -s 10 NP17_S33_L003_R1_001.fastq.gz"
+}

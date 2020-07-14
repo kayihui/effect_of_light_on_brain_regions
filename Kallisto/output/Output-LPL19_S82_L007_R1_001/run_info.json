@@ -1,0 +1,13 @@
+{
+	"n_targets": 116067,
+	"n_bootstraps": 0,
+	"n_processed": 12234062,
+	"n_pseudoaligned": 7658932,
+	"n_unique": 2678398,
+	"p_pseudoaligned": 62.6,
+	"p_unique": 21.9,
+	"kallisto_version": "0.44.0",
+	"index_version": 10,
+	"start_time": "Mon Feb 25 18:40:33 2019",
+	"call": "kallisto quant -i mouse-index-k21 -o Output-LPL19_S82_L007_R1_001 --single -l 48 -s 10 LPL19_S82_L007_R1_001.fastq"
+}
