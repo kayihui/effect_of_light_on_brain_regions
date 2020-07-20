@@ -1,0 +1,12 @@
+INFO [2020-01-21 14:13:12] $x
+INFO [2020-01-21 14:13:12] list(VTA.effect.genotype, VTA.WT.genes, VTA.Per1.genes)
+INFO [2020-01-21 14:13:12] 
+INFO [2020-01-21 14:13:12] $category.names
+INFO [2020-01-21 14:13:12] c("interaction", "WT ", "Per1")
+INFO [2020-01-21 14:13:12] 
+INFO [2020-01-21 14:13:12] $filename
+INFO [2020-01-21 14:13:12] NULL
+INFO [2020-01-21 14:13:12] 
+INFO [2020-01-21 14:13:12] $output
+INFO [2020-01-21 14:13:12] [1] TRUE
+INFO [2020-01-21 14:13:12] 

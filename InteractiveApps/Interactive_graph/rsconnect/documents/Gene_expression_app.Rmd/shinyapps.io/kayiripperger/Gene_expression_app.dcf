@@ -1,0 +1,12 @@
+name: Gene_expression_app
+title: Gene_expression_app
+username:
+account: kayiripperger
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1620174
+bundleId: 2694041
+url: https://kayiripperger.shinyapps.io/Gene_expression_app/
+when: 1577450662.75631
+asMultiple: FALSE
+asStatic: FALSE

@@ -1,0 +1,12 @@
+INFO [2020-02-27 15:56:10] $x
+INFO [2020-02-27 15:56:10] list(df1.genes, df2.genes, df3.genes, df4.genes)
+INFO [2020-02-27 15:56:10] 
+INFO [2020-02-27 15:56:10] $category.names
+INFO [2020-02-27 15:56:10] c(lab1, lab2, lab3, lab4)
+INFO [2020-02-27 15:56:10] 
+INFO [2020-02-27 15:56:10] $filename
+INFO [2020-02-27 15:56:10] NULL
+INFO [2020-02-27 15:56:10] 
+INFO [2020-02-27 15:56:10] $output
+INFO [2020-02-27 15:56:10] [1] TRUE
+INFO [2020-02-27 15:56:10] 

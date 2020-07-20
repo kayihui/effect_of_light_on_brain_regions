@@ -1,0 +1,9 @@
+INFO [2020-01-21 14:09:35] $x
+INFO [2020-01-21 14:09:35] list(NAc.effect.genotype, NAc.WT.genes, NAc.Per1.genes)
+INFO [2020-01-21 14:09:35] 
+INFO [2020-01-21 14:09:35] $category.names
+INFO [2020-01-21 14:09:35] c("interaction", "WT ", "Per1")
+INFO [2020-01-21 14:09:35] 
+INFO [2020-01-21 14:09:35] $filename
+INFO [2020-01-21 14:09:35] NULL
+INFO [2020-01-21 14:09:35] 

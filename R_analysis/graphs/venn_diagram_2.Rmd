@@ -1,0 +1,102 @@
+---
+title: "Venn diagrams"
+output: html_document
+---
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+library(VennDiagram)
+setwd("~/Desktop/brainRNASeq/R_analysis/R_output/results_tables/")
+
+significant_genes <- function(dds.results.table){
+  dds.results.table$remark <- "not significant"
+  dds.results.table$remark [dds.results.table$padj < 0.1] <- "significant"
+  dds.results.table$remark  <- factor(dds.results.table$remark, 
+																			  levels = c("not significant", "significant"))
+  return(dds.results.table)
+}
+
+venn_plot <- function(df1, df2, lab1, lab2){
+  df1.genes <- df1$ensembl_gene_id[df1$remark %in% "significant"]
+	df2.genes <- df2$ensembl_gene_id[df2$remark %in% "significant"]
+
+	venn.plot1 <- venn.diagram(
+  	x = list(df1.genes, df2.genes),
+  	category.names = c(lab1 , lab2),
+  	filename = NULL,
+  	output=TRUE
+	)
+	return(venn.plot1)
+}
+
+venn_plot2 <- function(df1, df2, df3, df4, lab1, lab2, lab3, lab4){
+	df1.genes <- df1$ensembl_gene_id[df1$remark %in% "significant"]
+	df2.genes <- df2$ensembl_gene_id[df2$remark %in% "significant"]
+	df3.genes <- df3$ensembl_gene_id[df3$remark %in% "significant"]
+	df4.genes <- df4$ensembl_gene_id[df4$remark %in% "significant"]
+
+	venn.plot2 <- venn.diagram(
+  	x = list(df1.genes, df2.genes, df3.genes, df4.genes),
+  	category.names = c(lab1, lab2, lab3, lab4),
+  	filename = NULL,
+  	output=TRUE
+	)
+	return(venn.plot2)
+}
+
+# SCN
+SCN_WT <- read.csv("SCN/SCN_WT_lightvsControl.csv", header = TRUE, stringsAsFactors = FALSE)
+SCN_Per1 <- read.csv("SCN/SCN_Per1_lightvsControl.csv", header = TRUE, stringsAsFactors = FALSE)
+
+SCN_WT <- significant_genes(SCN_WT)
+SCN_Per1 <- significant_genes(SCN_Per1)
+
+# LHb
+LHb_WT <- read.csv("LHb/LHb_WT_lightvsControl.csv", header = TRUE, stringsAsFactors = FALSE)
+LHb_Per1 <- read.csv("LHb/LHb_Per1_lightvsControl.csv", header = TRUE, stringsAsFactors = FALSE)
+
+LHb_WT <- significant_genes(LHb_WT)
+LHb_Per1 <- significant_genes(LHb_Per1)
+
+# VTA
+VTA_WT <- read.csv("VTA/VTA_WT_lightvsControl.csv", header = TRUE, stringsAsFactors = FALSE)
+VTA_Per1 <- read.csv("VTA/VTA_Per1_lightvsControl.csv", header = TRUE, stringsAsFactors = FALSE)
+
+VTA_WT <- significant_genes(VTA_WT)
+VTA_Per1 <- significant_genes(VTA_Per1)
+
+# NAc
+NAc_WT <- read.csv("NAc/NAc_WT_lightvsControl.csv", header = TRUE, stringsAsFactors = FALSE)
+NAc_Per1 <- read.csv("NAc/NAc_Per1_lightvsControl.csv", header = TRUE, stringsAsFactors = FALSE)
+
+NAc_WT <- significant_genes(NAc_WT)
+NAc_Per1 <- significant_genes(NAc_Per1)
+```
+
+## SCN
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+grid.draw(venn_plot(SCN_WT, SCN_Per1, "WT", "Per1"))
+```
+
+## LHb
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+grid.draw(venn_plot(LHb_WT, LHb_Per1, "WT", "Per1"))
+```
+
+## NAc
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+grid.draw(venn_plot(NAc_WT, NAc_Per1, "WT", "Per1"))
+```
+
+## VTA
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+grid.draw(venn_plot(VTA_WT, VTA_Per1, "WT", "Per1"))
+```
+
+## comparing all brain regions the WT w/o light, significant genes
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+grid.draw(venn_plot2(SCN_WT, LHb_WT, VTA_WT, NAc_WT, "SCN", "LHb","VTA","NAc"))
+```
+
+## comparing all brain regions the Per1 w/o light, significant genes
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+grid.draw(venn_plot2(SCN_Per1, LHb_Per1, VTA_Per1, NAc_Per1,"SCN", "LHb","VTA","NAc"))
+```

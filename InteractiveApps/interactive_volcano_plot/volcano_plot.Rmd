@@ -1,0 +1,56 @@
+---
+title: "Interactive volcano plots"
+runtime: shiny
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r eruptions, echo=FALSE, fig.height=8, fig.width=8, message=FALSE, warning=FALSE, error=FALSE}
+library(shiny)
+library(ggplot2)
+library(plotly)
+
+# hide the error msg in the final webpage
+tags$style(type="text/css", ".shiny-output-error { visibility: hidden; }", ".shiny-output-error:before { visibility: hidden; }")
+
+# load the required data for the plots
+full_table <- read.csv("full_table.csv", header = TRUE, stringsAsFactors = FALSE)
+
+# define the selections for the input panel
+brain_region <- c("NAc","LHb","SCN","VTA")
+
+exp_comparsion <- c("WT (control vs Light)", 
+										"Per1 (control vs Light)", 
+										"WT vs Per1 (control)",
+										"WT vs Per1 (Light)", 
+										"Different of light response between Per1 and WT")
+
+# input panel where the user can select the brain region and the experimental comparsion
+inputPanel(
+  selectInput('in1', 'Please choose a brain region ', brain_region, selectize=FALSE),
+  selectInput('in2', 'Please choose a comparsion', exp_comparsion, selectize=FALSE)
+)
+
+# interactive volcano plot, displaying the selected brain region and the 
+# experimental comparsion
+renderPlotly({
+	# subset the brain region
+  data_plot <- full_table[full_table$brain_region %in% input$in1, ]
+  
+  # subset the experimental comparsion
+  data_plot <- data_plot[data_plot$comparsion %in% input$in2, ]
+  
+  # create the plot
+  g <- ggplot(data_plot, 
+  						aes(x=log2FoldChange, y= -log10(pvalue), 
+  						text = paste("mgi_symbol:", mgi_symbol))) + geom_jitter(aes(color = remark))
+  
+  # make the plot interactive with Plotly
+  ggplotly(g)
+})
+
+```
+

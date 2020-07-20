@@ -1,0 +1,15 @@
+---
+title: "GO terms"
+output: html_document
+---
+```{r}
+library(ggplot2)
+library(dplyr)
+setwd("~/Desktop/brainRNASeq/R_analysis/R_output/topGO/NAc")
+fisher <- read.csv("BP/NAc_all_comparsion_BP_fisher.csv", header = TRUE, stringsAsFactors = FALSE)
+```
+
+```{r}
+g <- ggplot(fisher, aes(x= Term, y = -log10(classicFisher))) + geom_bar(stat = "identity")
+g + coord_flip() + ylab("-log(p-value)") + xlab("GO term")
+```

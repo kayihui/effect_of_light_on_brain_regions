@@ -1,0 +1,202 @@
+---
+title: "look at the expression of your favourite gene"
+runtime: shiny
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyr)
+library(dplyr)
+library(shiny)
+library(ggplot2)
+library(plotly)
+
+factorize <- function(df){
+	# This function is to change the experiment column to factor and relevel accordingly
+	df$experiment <- as.factor(df$experiment)
+  df$experiment <- factor(df$experiment,levels = c("WT-control", 
+  																								 "WT-light_induced", 
+  																								 "Per1-control", 
+  																								 "Per1-light_induced"))
+  return(df)
+}
+
+reshape_output <- function(df){
+	# This function is to reshape the dataframe for showing the normalized count 
+  # columns to be removed: ensembl_gene_id, region, mgi_sybmol, genotype, condition
+  
+	df <- select(df, -c(ensembl_gene_id, region, mgi_symbol, genotype, condition, sample))
+
+  #change the animal to numbers
+  df$animal <- as.integer(c(1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6))
+
+  # reshape the table from long from to wide form
+  df <- spread(df, key = experiment , value = counts)
+  return(df)
+}
+
+clean_display <- function(df){
+	df <- select(df, -c(ensembl_gene_id, mgi_symbol, description, brain_region))
+	return(df)
+}
+
+
+# read in the data table with the p-value of all the brain region and experimental
+# comparsion
+Pvalue_table <- read.csv("full_data.csv", header = TRUE, stringsAsFactors = FALSE)
+
+# read in the data table with the normalized count data from each brain region
+countData_SCN <- read.csv("SCN_count_ready_for_plot.csv", header = TRUE, 
+													stringsAsFactors = FALSE)
+countData_VTA <- read.csv("VTA_count_ready_for_plot.csv", header = TRUE, 
+													stringsAsFactors = FALSE)
+countData_LHb <- read.csv("LHb_count_ready_for_plot.csv", header = TRUE, 
+													stringsAsFactors = FALSE)
+countData_NAc <- read.csv("NAc_count_ready_for_plot.csv", header = TRUE, 
+													stringsAsFactors = FALSE)
+
+# relevel the experiment column for each dataframe
+countData_SCN <- factorize(countData_SCN)
+countData_VTA <- factorize(countData_VTA)
+countData_LHb <- factorize(countData_LHb)
+countData_NAc <- factorize(countData_NAc)
+```
+
+Please only enter 1 gene at a time. Example of the correct format: Gnai3
+
+```{r eruptions, echo=FALSE, fig.height=5, fig.width=5, message=FALSE, warning=FALSE}
+# hide the error message
+tags$style(type="text/css", ".shiny-output-error { visibility: hidden; }", ".shiny-output-error:before { visibility: hidden; }")
+
+
+# UX side panel allow the user to enter the gene of interest
+sidebarPanel(
+  inputPanel(
+    textInput("geneName", label = "Please enter the gene name:", value = "Gnai3")
+  ) 
+)
+
+
+# Output panels
+mainPanel(
+  tabsetPanel(
+  	# 1. graphs showing the gene expression plots of all the brain region
+    tabPanel("Graphs", textOutput("text1"), plotlyOutput("plot1"),
+                       textOutput("text2"), plotlyOutput("plot2"),
+                       textOutput("text3"), plotlyOutput("plot3"),
+                       textOutput("text4"), plotlyOutput("plot4")),
+    # 2. showing the count data and p-value of SCN
+    tabPanel("SCN", tableOutput("table1"), tableOutput("table2")),
+    # 3. showing the count data and p-value of VTA
+    tabPanel("VTA", tableOutput("table3"), tableOutput("table4")),
+    # 4. showing the count data and p-value of LHb
+    tabPanel("LHb", tableOutput("table5"), tableOutput("table6")),
+    # 5. showing the count data and p-value of NAc
+    tabPanel("NAc", tableOutput("table7"), tableOutput("table8"))
+  )
+)
+
+
+# backend text1 to text4, showing the text only when the gene of interest is not
+# found in the dataset
+output$text1 <- renderText({
+  if ( !{input$geneName} %in% countData_SCN$mgi_symbol){
+    "This gene does not express in SCN"
+  	}
+})
+output$text2 <- renderText({
+  if ( !{input$geneName} %in% countData_VTA$mgi_symbol){
+    "This gene does not express in VTA"
+  	}
+})
+output$text3 <- renderText({
+  if  ( !{input$geneName} %in% countData_LHb$mgi_symbol){
+    "This gene does not express in LHb"
+  	}
+})
+output$text4 <- renderText({
+  if  ( !{input$geneName} %in% countData_NAc$mgi_symbol){
+    "This gene does not express in NAc"}})
+
+
+# backend of the interactive plots
+output$plot1 <- renderPlotly({
+  countDataPlot_SCN <- countData_SCN[countData_SCN$mgi_symbol %in% {input$geneName}, ]
+  p <- ggplot(countDataPlot_SCN, aes(x=experiment, y = counts)) 
+  p <- p + geom_boxplot() + geom_point(aes(Animal = animal, Sample = sample)) + ggtitle("SCN")
+  ggplotly(p, tooltip = c("Animal","Sample", "counts"))
+})
+output$plot2 <- renderPlotly({
+  countDataPlot_VTA <- countData_VTA[countData_VTA$mgi_symbol %in% {input$geneName}, ]
+  p2 <- ggplot(countDataPlot_VTA, aes(x=experiment, y = counts)) 
+  p2 <- p2 + geom_boxplot() + geom_point(aes(Animal = animal, Sample = sample)) + ggtitle("VTA")
+  ggplotly(p2, tooltip = c("Animal","Sample", "counts"))
+})
+output$plot3 <- renderPlotly({
+  countDataPlot_LHb <- countData_LHb[countData_LHb$mgi_symbol %in% {input$geneName}, ]
+  p3 <- ggplot(countDataPlot_LHb, aes(x=experiment, y = counts)) 
+  p3 <- p3 + geom_boxplot() + geom_point(aes(Animal = animal, Sample = sample)) + ggtitle("LHb")
+  ggplotly(p3, tooltip = c("Animal","Sample", "counts"))
+})
+output$plot4 <- renderPlotly({
+  countDataPlot_NAc <- countData_NAc[countData_NAc$mgi_symbol %in% {input$geneName}, ]
+  p4 <- ggplot(countDataPlot_NAc, aes(x=experiment, y = counts)) 
+  p4 <- p4 + geom_boxplot() + geom_point(aes(Animal = animal, Sample = sample)) + ggtitle("NAc")
+  ggplotly(p4, tooltip = c("Animal","Sample", "counts"))
+})
+
+
+# backend of the datatable showing the normalized counts
+output$table1 <- renderTable({
+  countDataPlot_SCN <- countData_SCN[countData_SCN$mgi_symbol %in% {input$geneName}, ]
+  df <- reshape_output(countDataPlot_SCN)
+  return(df)
+})
+output$table3 <- renderTable({
+  countDataPlot_VTA <- countData_VTA[countData_VTA$mgi_symbol %in% {input$geneName}, ]
+  df <- reshape_output(countDataPlot_VTA)
+  return(df)
+})
+output$table5 <- renderTable({
+  countDataPlot_LHb <- countData_LHb[countData_LHb$mgi_symbol %in% {input$geneName}, ]
+  df <- select(countDataPlot_LHb, -c(ensembl_gene_id, region, mgi_symbol, genotype,
+                                                    condition, sample))
+  df$animal <- as.integer(c(1,2,3,4,5,6,1,2,3,4,5,1,2,3,4,5,6,1,2,3,4,5,6))
+  df <- spread(df, key = experiment , value = counts)
+  return(df)
+})
+output$table7 <- renderTable({
+  countDataPlot_NAc <- countData_NAc[countData_NAc$mgi_symbol %in% {input$geneName}, ]
+  df <- reshape_output(countDataPlot_NAc)
+  return(df)
+})
+
+
+# backend of the datatable showing the p-values
+output$table2 <- renderTable({
+  Pvalue_SCN <- Pvalue_table[Pvalue_table$brain_region %in% "SCN",]
+  selected_gene_SCN <- Pvalue_SCN[Pvalue_SCN$mgi_symbol %in% {input$geneName}, ]
+  selected_gene_SCN <- clean_display(selected_gene_SCN)
+  return(selected_gene_SCN)
+})
+output$table4 <- renderTable({
+  Pvalue_VTA <- Pvalue_table[Pvalue_table$brain_region %in% "VTA",]
+  selected_gene_VTA <- Pvalue_VTA[Pvalue_VTA$mgi_symbol %in% {input$geneName}, ]
+  selected_gene_VTA <- clean_display(selected_gene_VTA)
+  return(selected_gene_VTA)
+})
+output$table6 <- renderTable({
+  Pvalue_LHb <- Pvalue_table[Pvalue_table$brain_region %in% "LHb",]
+  selected_gene_LHb <- Pvalue_LHb[Pvalue_LHb$mgi_symbol %in% {input$geneName}, ]
+  selected_gene_LHb <- clean_display(selected_gene_LHb)
+  return(selected_gene_LHb)
+})
+output$table8 <- renderTable({
+  Pvalue_NAc <- Pvalue_table[Pvalue_table$brain_region %in% "NAc",]
+  selected_gene_NAc <- Pvalue_NAc[Pvalue_NAc$mgi_symbol %in% {input$geneName}, ]
+  selected_gene_NAc <- clean_display(selected_gene_NAc)
+  return(selected_gene_NAc)
+})
+```
+

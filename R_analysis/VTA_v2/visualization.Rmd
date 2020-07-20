@@ -1,0 +1,146 @@
+---
+title: "VTA - version 2, heatmaps"
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(ClassDiscovery) 
+library(RColorBrewer)
+setwd("~/Desktop/brainRNASeq/R_analysis/VTA_v2")
+
+VTA_v2_all_comparsion <- read_csv("VTA_v2_all_comparsion.csv")
+rlog.transformated <- read.csv("VTA_v2_rlog_transformated_data.csv")
+```
+
+## All comparision
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+# subset the list of ensembl_gene_id of genes that are not "not significant"
+significant.genes <- VTA_v2_all_comparsion[VTA_v2_all_comparsion$padj < 0.1, ] 
+significant.genes.name <- unique(significant.genes$ensembl_gene_id)
+
+# subset the rlog transformed data with the significant genes list
+rlog.significant.genes <- rlog.transformated[ rlog.transformated$X %in% significant.genes.name,]
+rownames(rlog.significant.genes) <- rlog.significant.genes$X
+rlog.significant.genes <- rlog.significant.genes[,-1]
+rlog.significant.genes <- as.matrix(rlog.significant.genes)
+
+aspectHeatmap(rlog.significant.genes, labCol=NULL, Colv = NA,
+							                 hExp=2, 
+							                 wExp=1.4, 
+							                 margins=c(6,3))
+
+```
+
+## WT (control vs Light)
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+sig.gene.wt <- VTA_v2_all_comparsion[VTA_v2_all_comparsion$comparsion %in% "WT (control vs Light)", ]
+
+# subset the list of ensembl_gene_id of genes that are not "not significant"
+significant.genes <- sig.gene.wt[sig.gene.wt$padj < 0.1, ] 
+significant.genes.name <- unique(significant.genes$ensembl_gene_id)
+
+# subset the rlog transformed data with the significant genes list
+rlog.significant.genes <- rlog.transformated[ rlog.transformated$X %in% significant.genes.name,]
+rownames(rlog.significant.genes) <- rlog.significant.genes$X
+rlog.significant.genes <- rlog.significant.genes[,-1]
+rlog.significant.genes <- as.matrix(rlog.significant.genes)
+
+aspectHeatmap(rlog.significant.genes, labCol=NULL, Colv = NA,
+							                 hExp=2, 
+							                 wExp=1.4, 
+							                 margins=c(6,3))
+
+```
+
+## Per1 (control vs Light)
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+sig.gene.per1 <- VTA_v2_all_comparsion[VTA_v2_all_comparsion$comparsion %in% "Per1 (control vs Light)", ]
+
+# subset the list of ensembl_gene_id of genes that are not "not significant"
+significant.genes <- sig.gene.per1[sig.gene.per1$padj < 0.1, ] 
+significant.genes.name <- unique(significant.genes$ensembl_gene_id)
+
+# subset the rlog transformed data with the significant genes list
+rlog.significant.genes <- rlog.transformated[ rlog.transformated$X %in% significant.genes.name,]
+rownames(rlog.significant.genes) <- rlog.significant.genes$X
+rlog.significant.genes <- rlog.significant.genes[,-1]
+rlog.significant.genes <- as.matrix(rlog.significant.genes)
+
+aspectHeatmap(rlog.significant.genes, labCol=NULL, Colv = NA,
+							                 hExp=2, 
+							                 wExp=1.4, 
+							                 margins=c(6,3))
+
+```
+
+## WT vs Per1 (control)
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+sig.gene.ct <- VTA_v2_all_comparsion[VTA_v2_all_comparsion$comparsion %in% "WT vs Per1 (control)", ]
+
+# subset the list of ensembl_gene_id of genes that are not "not significant"
+significant.genes <- sig.gene.ct[sig.gene.ct$padj < 0.1, ] 
+significant.genes.name <- unique(significant.genes$ensembl_gene_id)
+
+# subset the rlog transformed data with the significant genes list
+rlog.significant.genes <- rlog.transformated[ rlog.transformated$X %in% significant.genes.name,]
+rownames(rlog.significant.genes) <- rlog.significant.genes$X
+rlog.significant.genes <- rlog.significant.genes[,-1]
+rlog.significant.genes <- as.matrix(rlog.significant.genes)
+
+aspectHeatmap(rlog.significant.genes, labCol=NULL, Colv = NA,
+							                 hExp=2, 
+							                 wExp=1.4, 
+							                 margins=c(6,3))
+
+```
+
+
+## WT vs Per1 (Light)
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+sig.gene.light <- VTA_v2_all_comparsion[VTA_v2_all_comparsion$comparsion %in% "WT vs Per1 (Light)", ]
+
+# subset the list of ensembl_gene_id of genes that are not "not significant"
+significant.genes <- sig.gene.light[sig.gene.light$padj < 0.1, ] 
+significant.genes.name <- unique(significant.genes$ensembl_gene_id)
+
+# subset the rlog transformed data with the significant genes list
+rlog.significant.genes <- rlog.transformated[ rlog.transformated$X %in% significant.genes.name,]
+rownames(rlog.significant.genes) <- rlog.significant.genes$X
+rlog.significant.genes <- rlog.significant.genes[,-1]
+rlog.significant.genes <- as.matrix(rlog.significant.genes)
+
+aspectHeatmap(rlog.significant.genes, labCol=NULL, Colv = NA,
+							                 hExp=2, 
+							                 wExp=1.4, 
+							                 margins=c(6,3))
+
+```
+
+## Different of light response between Per1 and WT
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+sig.gene.interaction <- VTA_v2_all_comparsion[VTA_v2_all_comparsion$comparsion %in% "Different of light response between Per1 and WT", ]
+
+# subset the list of ensembl_gene_id of genes that are not "not significant"
+significant.genes <- sig.gene.interaction[sig.gene.interaction$padj < 0.1, ] 
+significant.genes.name <- unique(significant.genes$ensembl_gene_id)
+
+# subset the rlog transformed data with the significant genes list
+rlog.significant.genes <- rlog.transformated[ rlog.transformated$X %in% significant.genes.name,]
+rownames(rlog.significant.genes) <- rlog.significant.genes$X
+rlog.significant.genes <- rlog.significant.genes[,-1]
+rlog.significant.genes <- as.matrix(rlog.significant.genes)
+
+aspectHeatmap(rlog.significant.genes, labCol=NULL, Colv = NA,
+							                 hExp=2, 
+							                 wExp=1.4, 
+							                 margins=c(6,3))
+
+```
+
+```{r}
+sessionInfo()
+```

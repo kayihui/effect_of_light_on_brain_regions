@@ -1,0 +1,131 @@
+---
+title: "Download the dataset"
+runtime: shiny
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r eruptions, echo=FALSE}
+# readin the gene expression data and the GO description
+geneExp <- read.csv("full_data_withGO.csv", header = TRUE, stringsAsFactors = FALSE)
+GO_description <- read.csv("GO_description.csv", header = TRUE, stringsAsFactors = FALSE )
+
+
+sidebarLayout(
+	# This siderbar layout contain a sidebar and 2 main panels with the gene expression 
+	# data and the GO description.
+	
+  sidebarPanel(
+  	# Create a new Row in the UI, which contains 3 dropdown meun (selectInputs),
+    # 2 slide bar (sliderInput) and a download button(downloadButton)
+  	
+  	# 1. dropdown meun: Brain region
+    selectInput("brain", 
+    						"Brain region:", 
+    						c("All", unique(as.character(geneExp$brain_region)))),
+    
+    # 2. dropdown meun: Comparsion
+    selectInput("comp", 
+    						"Comparsion:",
+                c("All", unique(as.character(geneExp$comparsion)))),
+    
+    # 3. dropdown meun: Remark
+    selectInput("rem", 
+    						"Remark:", 
+    						c("All", unique(as.character(geneExp$remark)))),
+    
+    # 4. slide bar to select the pval
+    sliderInput("Pval", 
+    						"P value (smaller than):", 
+    						min = 0, 
+    						max = 1, 
+    						value = 1, 
+    						step = 0.1),
+    
+    # 5. slide bar to select the padj
+    sliderInput("Padj", 
+    						"Padj (smaller than):", 
+    						min = 0, 
+    						max = 1, 
+    						value = 1, 
+    						step = 0.1),
+    
+    # 6. download button
+    downloadButton("download_data", label = "Download")
+  ),# close sidebarPanel
+  
+  mainPanel(
+  	# In the main panel, there are 2 tabs containing the gene expression data
+  	# and the GO description.
+  	
+    tabsetPanel(
+    	# 1. output the gene expression datatable, "table", reactive element 
+      tabPanel("data", DT::dataTableOutput("table")),
+      
+      # 2. output the GO description table, "GO_table", reactive element
+      tabPanel("GO descriptions", DT::dataTableOutput("GO_table"))
+      
+    ) # close tabsetPanel
+  ) # close mainPanel
+)# close sidebarLayout
+  
+
+# backend of the download button (reactive output)
+output$download_data <- downloadHandler(
+  filename <- function(){
+    paste('data-', Sys.Date(), '.csv', sep='')
+   },
+  content <- function(file){
+    write.csv(thedata(), file, row.names = FALSE)
+  }
+)
+
+# backend of the gene expression table (reactive output)
+thedata <- reactive({
+  # subset the gene expression table according to the input from the user
+	data <- geneExp  
+    if (input$brain != "All") {
+      data <- data[data$brain_region == input$brain, ]
+    }
+    if (input$comp != "All") {
+      data <- data[data$comparsion == input$comp, ]
+    }
+    if (input$rem != "All") {
+      data <- data[data$remark == input$rem, ]
+    }
+    data <- data[data$pvalue <= input$Pval, ]
+    data <- data[data$padj <= input$Padj, ]
+    data
+})
+# render the subsetted table
+output$table <- DT::renderDataTable(DT::datatable({
+ thedata()
+  })
+)
+
+# backend of GO description table (reactive output)
+output$GO_table <- DT::renderDataTable(DT::datatable({
+ df <- GO_description
+ df
+  })
+)
+
+```
+
+
+
+Note: 
+
++ baseMean: the average of the normalized counts taken over all samples
++ log2FoldChange: log2 fold change between the groups. E.g. value 2 means that the expression has increased 4-fold
++ lfcSE: standard error of the log2FoldChange estimate
++ stat: Wald statistic
++ pvalue: Wald test p-value
++ padj: Benjamini-Hochberg adjusted p-value
+
+Details of the analysis method, please refer to the following article
+Analyzing RNA-seq data with DESeq2 by Michael I. Love, Simon Anders, and Wolfgang Huber
+http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html

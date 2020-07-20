@@ -1,0 +1,12 @@
+name: download_dataset_v2
+title: download_dataset_v2
+username:
+account: kayiripperger
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1888626
+bundleId: 2844013
+url: https://kayiripperger.shinyapps.io/download_dataset_v2/
+when: 1583162330.39343
+asMultiple: FALSE
+asStatic: FALSE

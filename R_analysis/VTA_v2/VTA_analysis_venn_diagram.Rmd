@@ -1,0 +1,86 @@
+---
+title: "VTA analysis comparsion"
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+library(VennDiagram)
+library(ggplot2)
+library(readr)
+
+setwd("~/Desktop/brainRNASeq/R_analysis/")
+VTA_v1 <- read_csv("R_output/results_tables/VTA/VTA_all_comparsion.csv")
+VTA_v2 <- read_csv("VTA_v2/VTA_v2_all_comparsion.csv")
+```
+
+```{r}
+plotVenn <- function(compare.exp){
+VTA_v1 <- VTA_v1[VTA_v1$comparsion %in% compare.exp, ]
+VTA_v1.sig <- VTA_v1$ensembl_gene_id[VTA_v1$padj < 0.1]
+VTA_v1.sig <- unique(VTA_v1.sig)
+
+VTA_v2 <- VTA_v2[VTA_v2$comparsion %in% compare.exp, ]
+VTA_v2.sig <- VTA_v2$ensembl_gene_id[VTA_v2$padj < 0.1]
+VTA_v2.sig <- unique(VTA_v2.sig)
+
+venn.plot1 <- venn.diagram(
+  x = list(VTA_v1.sig, VTA_v2.sig),
+  category.names = c("version 1" , "version 2"),
+  filename = NULL,
+  output=TRUE
+)
+return(venn.plot1)
+}
+
+```
+
+## All comparsion
+```{r}
+VTA_v1.sig <- VTA_v1$ensembl_gene_id[VTA_v1$padj < 0.1]
+VTA_v1.sig <- unique(VTA_v1.sig)
+
+VTA_v2.sig <- VTA_v2$ensembl_gene_id[VTA_v2$padj < 0.1]
+VTA_v2.sig <- unique(VTA_v2.sig)
+
+venn.plot1 <- venn.diagram(
+  x = list(VTA_v1.sig, VTA_v2.sig),
+  category.names = c("version 1" , "version 2"),
+  filename = NULL,
+  output=TRUE
+)
+grid.draw(venn.plot1)
+```
+
+## WT (control vs Light)
+```{r}
+plot1 <- plotVenn("WT (control vs Light)")
+grid.draw(plot1)
+```
+
+## Per1 (control vs Light)
+```{r}
+plot2 <- plotVenn("Per1 (control vs Light)")
+grid.draw(plot2)
+```
+
+## WT vs Per1 (control)
+```{r}
+plot3 <- plotVenn("WT vs Per1 (control)")
+grid.draw(plot3)
+```
+
+## WT vs Per1 (Light)
+```{r}
+plot4 <- plotVenn("WT vs Per1 (Light)")
+grid.draw(plot4)
+```
+
+## Different of light response between Per1 and WT
+```{r}
+plot5 <- plotVenn("Different of light response between Per1 and WT")
+grid.draw(plot5)
+```
+
+```{r}
+sessionInfo()
+```

@@ -1,0 +1,21 @@
+sample,animal ,genotype,region,condition,file_name
+VW3_S50,A3,WT,VTA,control,Output-VW3_S50_L005_R1_001
+VW4_S62,A4,WT,VTA,control,Output-VW4_S62_L006_R1_001
+VW5_S51,A5,WT,VTA,control,Output-VW5_S51_L005_R1_001
+VW6_S63,A6,WT,VTA,control,Output-VW6_S63_L006_R1_001
+VP13_S55,A13,Per1,VTA,control,Output-VP13_S55_L005_R1_001
+VP14_S67,A14,Per1,VTA,control,Output-VP14_S67_L006_R1_001
+VP15_S56,A15,Per1,VTA,control,Output-VP15_S56_L005_R1_001
+VP16_S68,A16,Per1,VTA,control,Output-VP16_S68_L006_R1_001
+VP17_S57,A17,Per1,VTA,control,Output-VP17_S57_L005_R1_001
+VP18_S69,A18,Per1,VTA,control,Output-VP18_S69_L006_R1_001
+VWL7_S52,A7,WT,VTA,light_induced,Output-VWL7_S52_L005_R1_001
+VWL8_S64,A8,WT,VTA,light_induced,Output-VWL8_S64_L006_R1_001
+VWL9_S53,A9,WT,VTA,light_induced,Output-VWL9_S53_L005_R1_001
+VWL10_S65,A10,WT,VTA,light_induced,Output-VWL10_S65_L006_R1_001
+VWL11_S54,A11,WT,VTA,light_induced,Output-VWL11_S54_L005_R1_001
+VWL12_S66,A12,WT,VTA,light_induced,Output-VWL12_S66_L006_R1_001
+VPL19_S58,A19,Per1,VTA,light_induced,Output-VPL19_S58_L005_R1_001
+VPL20_S70,A20,Per1,VTA,light_induced,Output-VPL20_S70_L006_R1_001
+VPL21_S59,A21,Per1,VTA,light_induced,Output-VPL21_S59_L005_R1_001
+VPL22_S71,A22,Per1,VTA,light_induced,Output-VPL22_S71_L006_R1_001

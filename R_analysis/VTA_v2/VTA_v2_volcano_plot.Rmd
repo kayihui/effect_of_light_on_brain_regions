@@ -1,0 +1,78 @@
+---
+title: "VTA second analysis - volcano plots"
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+library(ggplot2)
+library(dplyr)
+
+prepare_data_for_graph <- function(dds.results.table){
+  dds.results.table$highlight <- "not significant"
+  dds.results.table$highlight[dds.results.table$padj < 0.1] <- "significant"
+  dds.results.table$highlight <- factor(dds.results.table$highlight, 
+																			  levels = c("not significant", "significant"))
+  return(dds.results.table)
+}
+
+```
+
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+
+vocanlo_plot <- function(dds.results.table, title){
+  gpr88 <- dds.results.table[dds.results.table$mgi_symbol %in% "Gpr88",]
+
+  # Volcano plot
+  g <- ggplot(dds.results.table, aes(x=log2FoldChange, y= -log10(pvalue)))
+  g <- g + geom_jitter(aes(color = highlight)) + scale_color_manual(values = c("grey", "black"))
+  g <- g + ylim(0, 8) + xlim(-8, 8)
+  g <- g + xlab("log2 (Fold change)") + ggtitle(title)
+  g <- g +  theme(text = element_text(size=16),
+								  panel.background = element_rect(fill = NA),
+								  axis.line = element_line(size = 0.8, colour = "black"),
+								  axis.ticks = element_line(size = 1),
+								  legend.position = c(0.89, 0.90),
+								  legend.key = element_rect(size = 0.5, fill = "white", colour = "black"),
+								  legend.title = element_blank(),
+  								plot.title = element_text(hjust = 0.5)) 
+  
+  g <- g + geom_point(aes(x = gpr88$log2FoldChange , y = -log10(gpr88$pvalue)), color = "red", size = 2.5)
+
+return(g)
+}
+```
+
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+# load the dataframe with the gene info and remark added
+setwd("~/Desktop/brainRNASeq/R_analysis/VTA_v2")
+WT.light <- read.csv("VTA_v2_WT_lightvsControl.csv", header = TRUE, stringsAsFactors = FALSE)
+Per1.light <- read.csv("VTA_v2_Per1_lightvsControl.csv", header = TRUE, stringsAsFactors = FALSE)
+control.genotype <- read.csv("VTA_v2_WTvsPer1_control.csv", header = TRUE, stringsAsFactors = FALSE)
+light.genotype <- read.csv("VTA_v2_WTvsPer1_light.csv", header = TRUE, stringsAsFactors = FALSE)
+interaction <- read.csv("VTA_v2_effectAcrossGenotype.csv", header = TRUE, stringsAsFactors = FALSE)
+```
+
+```{r fig.height=7, fig.width=7, message=FALSE, warning=FALSE}
+WT.light.updated <- prepare_data_for_graph(WT.light)
+vocanlo_plot(WT.light.updated, "WT control vs light")
+```
+
+```{r fig.height=7, fig.width=7, message=FALSE, warning=FALSE}
+Per1.light.updated <- prepare_data_for_graph(Per1.light)
+vocanlo_plot(Per1.light.updated, "Per1 control vs light")
+```
+
+```{r fig.height=7, fig.width=7, message=FALSE, warning=FALSE}
+control.genotype.updated <- prepare_data_for_graph(control.genotype)
+vocanlo_plot(control.genotype.updated, "WT vs Per1 (control)")
+```
+
+```{r fig.height=7, fig.width=7, message=FALSE, warning=FALSE}
+light.genotype.updated <- prepare_data_for_graph(light.genotype)
+vocanlo_plot(light.genotype.updated, "WT vs Per1 (light)")
+```
+
+```{r fig.height=7, fig.width=7, message=FALSE, warning=FALSE}
+interaction.updated <- prepare_data_for_graph(interaction)
+vocanlo_plot(interaction.updated, "Effect of genotype in light response")
+```

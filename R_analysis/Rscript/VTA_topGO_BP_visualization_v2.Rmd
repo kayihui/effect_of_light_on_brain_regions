@@ -1,0 +1,105 @@
+---
+title: "VTA all comparsion TopGO(Biological process) analysis - WT control vs light"
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+library(topGO)
+library(dplyr)
+library(tidyr)
+library(genefilter)
+library(ggplot2)
+
+# Prepare the list of gene of interest and the list of the background
+
+# set working directory
+setwd("~/Desktop/brainRNASeq/R_analysis/R_output/results_tables/")
+
+# read in the file with the normalized data
+result <- read.csv("VTA/VTA_WT_lightvsControl.csv", header = TRUE, 
+									                              stringsAsFactors = FALSE)
+result$remark <- as.factor(result$remark)
+
+# subset the genes of interest
+gene.of.interest <- result[(result$remark %in% "significant") | 
+													 	(result$remark %in% "significant & more than 1-fold"),]
+
+# remove duplicated rows
+gene.of.interest <- unique(gene.of.interest)
+
+# define the gene background
+# remove duplicated rows with different mgi_symbol but the same ensembl_gene_id
+duplicate.row <- result[duplicated(result$ensembl_gene_id), ]
+duplicate.row.list <- as.numeric(rownames(duplicate.row))
+result.unique <- result[- duplicate.row.list, ]
+
+rownames(result.unique) <- result.unique$ensembl_gene_id
+
+gene.of.interest.list <- gene.of.interest$ensembl_gene_id
+gene.of.interest.list <- unique(gene.of.interest.list)
+
+overall.base.mean <- as.matrix(result.unique[,"baseMean", drop = F])
+gene.background <- genefinder(overall.base.mean, gene.of.interest.list, 
+															10, method = "euc")
+gene.background <- rownames(overall.base.mean)[as.vector(sapply(gene.background, 
+																																function(x)x$indices))]
+gene.background <- setdiff(gene.background, gene.of.interest$ensembl_gene_id)
+
+gene.universe.list <- unique(c(gene.background, gene.of.interest.list))
+
+gene.list <- factor(as.integer(gene.universe.list %in% gene.of.interest.list))
+names(gene.list) <- gene.universe.list
+```
+
+```{r fig.height=6, fig.width=8, message=FALSE, warning=FALSE, tidy=TRUE}
+
+library(RColorBrewer)
+library(cancerTiming)
+
+all.gene <- log2(result.unique$baseMean)
+gene.selected <- log2(result.unique[gene.of.interest$ensembl_gene_id,"baseMean"])
+background <- log2(result.unique[gene.background, "baseMean"])
+
+multidensity(list(all = all.gene, fore = gene.selected, back = background),
+             xlab="log2 mean counts", main = "Matching for enrichment analysis")
+
+legend("topright", legend = c("All gene", "Gene of interest","background"), 
+                   col = c("black","green","red"),
+                   lwd=1)
+```
+
+```{r message=FALSE, warning=FALSE, tidy=TRUE}
+GO.data <- new ("topGOdata", ontology ="BP", allGenes = gene.list, 
+								annot=annFUN.org, mapping="org.Mm.eg.db", ID = "ensembl")
+
+# perform the classic Fisher test
+fisher.test <- runTest(GO.data, algorithm = "classic", statistic = "Fisher")
+
+fisher.result <- GenTable(GO.data, classicFisher = fisher.test,
+                                   ranksOf = "classicFisher",
+													         topNodes = 10)
+
+```
+
+```{r fig.height=10, fig.width=8, message=FALSE, warning=FALSE, tidy=TRUE}
+par(cex = 0.6)
+showSigOfNodes(GO.data, score(fisher.test), firstSigNodes = 5, useInfo = "all")
+```
+
+```{r}
+fisher.result$classicFisher <- as.numeric(fisher.result$classicFisher)
+fisher.result <- fisher.result[rank(fisher.result$classicFisher),]
+g <- ggplot(fisher.result, aes(x= Term, y = -log10(classicFisher))) + geom_bar(stat = "identity")
+g + coord_flip() + ylab("-log(p-value)") + xlab("GO term")
+```
+
+```{r}
+setwd("~/Desktop/brainRNASeq/R_analysis/R_output/topGO/VTA/")
+saveRDS(GO.data,"BP/VTA_light_topGO_BP.RData")
+write.csv(fisher.result, "BP/VTA_light_BP_fisher.csv", row.names = FALSE)
+
+```
+
+```{r}
+sessionInfo()
+```
