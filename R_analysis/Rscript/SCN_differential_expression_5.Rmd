@@ -29,7 +29,7 @@ plot(metadata(dds.results)$filterNumRej, xlab="quantile of baseMean",
 
 ```{r}
 hist(dds.results$pvalue, breaks = 20, col ='grey', 
-		 main = "The effect of light on WT", xlab = "pvalue", ylab = "Frequency")
+		 main = "TEffect across genotype", xlab = "pvalue", ylab = "Frequency")
 ```
 
 ```{r warning=FALSE}
