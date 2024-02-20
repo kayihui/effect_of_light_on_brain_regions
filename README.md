@@ -2,6 +2,7 @@
 
 Authours: Iwona Olejniczak, Jürgen A. Ripperger, Federica Sandrelli, Anna Schnell, Laureen Mansencal-Strittmatter, Katrin Wendrich, Ka Yi Hui, Andrea Brenna, Naila Ben Fredj, and Urs Albrecht
 
+Link to the paper: https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1009625
 
 To reproduce the bioinformatic results, please download this repo, and read through the explaninatory documents in the explaintory_doc folder.
 
